@@ -19,7 +19,7 @@ test_file = open("test.txt", "r+")
 text_in_file = test_file.read()
 print(text_in_file)
 
-'''
+
 
 # File list with txt files
 file_list = glob.glob("./*.txt")
@@ -38,19 +38,26 @@ for file_name in file_list:
     text_in_file = test_file.read()
     print(text_in_file)
     i += 1
+'''
 
-a = open("output.txt", "w")
+# a = open("output.txt", "w")
 all_file_list = []
 for path, subdirs, files in os.walk(r'./'):
     for filename in files:
         f = os.path.join(path, filename)
-        a.write(str(f) + os.linesep)
+        # a.write(str(f) + os.linesep)
         all_file_list.append(str(f))
 
 print(all_file_list)
 
+j = 0
+txt_file_list = []
+for txt_file in all_file_list:
+    if all_file_list[j].find(".txt") is not -1:
+        print("true!")
+        print(all_file_list[j])
+        txt_file = all_file_list[j]
+        txt_file_list.append(all_file_list[j])
+    j += 1
 
-
-
-
-
+print(txt_file_list)
