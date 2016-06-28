@@ -1,0 +1,6 @@
+{
+  "name": "WiresharkFormatSwitchr",
+  "tagline": "",
+  "body": "### What is it\r\n公司为了实现功能自动化，有些同事用Wireshark抓包的时候格式经常保存错误，并不是公司工具中所需要的Sniffer 2.00x类型的包，所以我写了个Python小程序，可以将任何Wireshark保存的capture类型转换成Sniffer 2.00x格式。\r\n\r\n### Authors and Contributors\r\nIn 2016, 仲耀晖 (@tzattack) founded Wireshark Format Switcher.\r\n\r\n### Support or Contact\r\nFind me on Twitter and Weibo: @tzattack. My personal website: tzattackblog@wordpress.com",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
