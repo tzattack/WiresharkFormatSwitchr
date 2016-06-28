@@ -7,44 +7,58 @@ Loading all file list
 all_file_list = []
 for path, subdirectories, files in os.walk(r'.'):
     for filename in files:
-        f = os.path.join(path, filename)
-        all_file_list.append(str(f))
+        file = os.path.join(path, filename)
+        all_file_list.append(str(file))
 print("All the files in directory and subdirectory: ")
 print(all_file_list)
+print("-------------------------------------------------------------")
 
 '''
 pcapng file converting
 '''
 counter = 0
-pcapng_file_list = []
-for pcapng_file in all_file_list:
-    if all_file_list[counter].find(".pcapng") is not -1:
-        pcapng_file = all_file_list[counter]
-        pcapng_file_list.append(pcapng_file)
+convert_file_list = []
+for convert_file in all_file_list:
+    if all_file_list[counter].find(".snoop") is not -1:
+        convert_file = all_file_list[counter]
+        convert_file_list.append(convert_file)
+    if all_file_list[counter].find(".pcap") is not -1:
+        convert_file = all_file_list[counter]
+        convert_file_list.append(convert_file)
+    if all_file_list[counter].find(".cap") is not -1:
+        convert_file = all_file_list[counter]
+        convert_file_list.append(convert_file)
+    if all_file_list[counter].find(".libpcap") is not -1:
+        convert_file = all_file_list[counter]
+        convert_file_list.append(convert_file)
+    if all_file_list[counter].find(".5vw") is not -1:
+        convert_file = all_file_list[counter]
+        convert_file_list.append(convert_file)
+    if all_file_list[counter].find(".txt") is not -1:
+        convert_file = all_file_list[counter]
+        convert_file_list.append(convert_file)
+    if all_file_list[counter].find(".ncf") is not -1:
+        convert_file = all_file_list[counter]
+        convert_file_list.append(convert_file)
     counter += 1
-print("All the pcapng file: ")
-print(pcapng_file_list)
+print("All the files to be converted: ")
+print(convert_file_list)
+print("=============================================================")
 
 counter = 0
-for content in pcapng_file_list:
+for content in convert_file_list:
     # Get file name
-    file_name = os.path.basename(pcapng_file_list[counter])
-    print(file_name)
-    subprocess.call(["echo", "Hello, world!"], shell=False)
+    file_name = os.path.basename(convert_file_list[counter])
+
     # change directory
     current_directory = os.path.dirname(os.path.abspath("__file__"))
-    print("Current directory is : " + current_directory)
     subprocess.call(["cd", current_directory], shell=True)
-    # converting capture format
-    script_dir = os.path.dirname(os.path.abspath("__file__"))
-    rel_path = file_name
-    abs_file_path = os.path.join(script_dir, rel_path)
-    infile = pcapng_file_list[counter]
-    print("*******Infile directory: " + infile)
-    abs_file_output_path = os.path.join(script_dir, ".\output\\")
-    output_file_name = "./output/" + file_name + "_output.cap"
-    print(output_file_name)
-    subprocess.call(["editcap", "-F", "ngwsniffer_2_0", infile, output_file_name],
-                    shell=False)
 
+    # converting capture format
+    infile = convert_file_list[counter]
+    outfile = "./output/" + file_name + "_output.cap"
+    subprocess.call(["editcap", "-F", "ngwsniffer_2_0", infile, outfile],
+                    shell=False)
+    print("File <" + file_name + "> has been converted into Sniffer 2.00x format!")
+    print("*************************************************************")
     counter += 1
