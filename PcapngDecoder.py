@@ -36,6 +36,6 @@ def decode_pcapng(file_dir_name):
 
     end_of_package = lenght_of_package - 518
     real_content = origin_file_content[:end_of_package]
-    print(real_content)
+    print("Content parsed!")
 
     return real_content
