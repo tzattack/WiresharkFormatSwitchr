@@ -1,5 +1,5 @@
-def decode_pcapng():
-    origin_file = open("test.pcapng", "rb")
+def decode_pcapng(file_dir_name):
+    origin_file = open(file_dir_name, "rb")
     origin_file_content = origin_file.read()
 
     block_type_start = 0
@@ -24,6 +24,7 @@ def decode_pcapng():
     print("$$ Block Total Length: " + str(block_total_length_2))
     if block_total_length != block_total_length_2:
         print("Package parse error!")
+        return False
     else:
         print("Package parse succeed!")
 
@@ -37,4 +38,4 @@ def decode_pcapng():
     real_content = origin_file_content[:end_of_package]
     print(real_content)
 
-    return 0
+    return real_content
