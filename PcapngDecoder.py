@@ -1,4 +1,7 @@
-def decode_pcapng(file_dir_name):
+import FileWriter
+
+
+def decoder(file_dir_name, file_name):
     origin_file = open(file_dir_name, "rb")
     origin_file_content = origin_file.read()
 
@@ -31,11 +34,26 @@ def decode_pcapng(file_dir_name):
     device_system = origin_file_content[112:142]
     print("$$ Device System: " + str(device_system))
 
-    lenght_of_package = len(origin_file_content)
-    print(lenght_of_package)
+    length_of_package = len(origin_file_content)
+    print(length_of_package)
 
-    end_of_package = lenght_of_package - 518
-    real_content = origin_file_content[:end_of_package]
+    end_of_package = length_of_package - 518
+    real_content = origin_file_content[211:end_of_package]
     print("Content parsed!")
 
-    return real_content
+    block_type = origin_file_content[0:4]
+    print(block_type)
+    if block_type == int("0x0a", 16):
+        print("This is Pcap-NG file!")
+    else:
+        print("THIS IS NOT A PCAPNG FILE!")
+
+    block_total_length = origin_file_content[4:8]
+    print(str(block_total_length))
+
+    section_head_block = origin_file_content[0:46]
+    print(section_head_block)
+
+    FileWriter.file_writer(real_content, file_name)
+
+    return True

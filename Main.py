@@ -8,26 +8,26 @@ convert_file_list = []
 FileReader.file_reader(all_file_list, convert_file_list)
 
 
-def type_check(infile):
+def type_check(infile, file_name):
     file_type = os.path.splitext(infile)[1]
     if file_type == ".txt":
         return False
     elif file_type == ".pcapng":
-        PcapngDecoder.decode_pcapng(infile)
+        PcapngDecoder.decoder(infile, file_name)
         return True
 
 
-def parser(convert_file_list):
+def parser(file_list):
     counter = 0
-    for content in convert_file_list:
+    for f in file_list:
         # Get file name
-        file_name = os.path.basename(convert_file_list[counter])
+        file_name = os.path.basename(file_list[counter])
 
         # converting capture format
-        infile = convert_file_list[counter]
+        infile = file_list[counter]
         outfile = "./output/" + file_name + "_output.cap"
 
-        flag = type_check(infile)
+        flag = type_check(infile, file_name)
 
         if flag:
             print("File <" + file_name + "> has been converted into Sniffer 2.00x format!")
