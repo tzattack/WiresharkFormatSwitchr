@@ -12,24 +12,27 @@ package 数据结构：
 '''
 
 
-def file_writer(content, timestamp, file_name):
+def file_writer(package):
+    # 获取解码库所得数据：
+    file_name = package[0]
+    time_stamp = package[1]
+    pkt_counter = package[2]
+    content_length = package[3]
+    first_pkt_time = package[4]
+    first_pkt_length = package[5]
+    content = package[6]
+
+    # 输出文件地址和文件名：
     outfile = "./output/" + file_name + "_output.cap"
     file = open(outfile, "wb")
 
+    # NA Sniffer Windows 2.00x 文件格式：
     head = b'\x58\x43\x50\x00'
     version = b'\x30\x30\x32\x2e\x30\x30\x31\x00'
-    if timestamp == "":
-        time_stamp = b'\x00\x00\x00\x00'
-    else:
-        time_stamp = timestamp
-    file_length = b''
-    first_pkt_time = b''
-    first_pkt_length = b''
-    pkt_num = b'\x4f\x00\x00\x00'
     dump_00 = b'\x00\x00\x00\x00'
     dump_80 = b'\x80\x00\x00\x00'
-    capture = head + version + time_stamp + pkt_num + dump_00 + dump_80 + file_length
-    capture = capture + dump_00 * 24 + first_pkt_time + dump_00 + first_pkt_length * 2 + dump_00 * 7
+    capture = head + version + time_stamp + pkt_counter + dump_00 + dump_80 + content_length
+    capture = capture + dump_00 * 24 + first_pkt_time + dump_00 + first_pkt_length + first_pkt_length + dump_00 * 7
     capture += content
 
     print("Reverse Test:")
@@ -45,8 +48,8 @@ def file_writer(content, timestamp, file_name):
     # data = bytes().fromhex(temp)
     # print(temp)
     # print(data)
-    int_to_little_endian(468)
-    int_to_little_endian(122331)
+    # int_to_little_endian(468)
+    # int_to_little_endian(122331)
 
     # print(struct.pack('@hhhh', int(data[0:2], 16), int(data[2:4], 10), int(data[4:6], 10), int(data[6:8], 10)))
     # print(capture)

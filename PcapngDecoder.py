@@ -45,8 +45,12 @@ def decoder(file_dir_name, file_name):
     print("The number of packets: " + str(number))
 
     time_stamp = timestamp_high
-
-    FileWriter.file_writer(packet_content, time_stamp, file_name)
+    pkt_counter = number
+    first_pkt_time = timestamp_high
+    first_pkt_length = block_length
+    content = packet_content
+    package = [file_name, time_stamp, pkt_counter, content_length, first_pkt_time, first_pkt_length, content]
+    FileWriter.file_writer(package)
 
     return True
 
