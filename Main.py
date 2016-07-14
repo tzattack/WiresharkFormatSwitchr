@@ -1,5 +1,6 @@
 import os
 import PcapngDecoder
+import LibpcapDecoder
 import FileReader
 
 all_file_list = []
@@ -15,6 +16,12 @@ def type_check(infile, file_name):
     elif file_type == ".pcapng":
         PcapngDecoder.decoder(infile, file_name)
         return True
+    elif file_type == ".pcap":
+        LibpcapDecoder.decoder(infile, file_name)
+        return True
+    else:
+        print("<" + file_name + "> Unknown File Format!")
+        return False
 
 
 def parser(file_list):

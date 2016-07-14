@@ -1,51 +1,79 @@
-def file_writer(content, file_name):
+import struct
+
+'''
+package 数据结构：
+    0: file_name
+    1: time_stamp
+    2: pkt_counter
+    3: content_length
+    4: first_pkt_time
+    5: first_pkt_length
+    6: content
+'''
+
+
+def file_writer(content, timestamp, file_name):
     outfile = "./output/" + file_name + "_output.cap"
     file = open(outfile, "wb")
-    print(file.mode)
-    print(file.name)
-    capture_head = "\x58\x43\x50\x00\x30\x30\x32\x2e\x30\x30\x31\x00"
-    capture_info_1 = "\x31\xE6\x70\x57\x4f\x00\x00\x00\x00\x00\x00\x00\x80\x00\x00\x00\x59\x48\x00\x00"
-    capture_info_2 = "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-    capture_info_3 = "\x45\xf0\x07\x00\x00\x00\x00\x00\xab\x01\xab\x01\x00\x00\x00\x00"
-    capture_info_4 = "\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\x0c\x8b"
-    capture_info_5 = "\xfd\x3e\x56\x57\x08\x00\x45\x00\x01\x9d\x5a\x2a\x00\x00\x80\x11\x56\xc1\xc0"
 
-    capture_info_6 = "\x20\x0d\x0a\x0d\x0a\x04\xd7\x3c\x01\x00\x00\x00\x00\x36\x00\x36\x00\x00\x00\x00\x00"
-    capture_info_7 = capture_info_2
-    capture_info_8 = "\x00\x00\x00\x00\x00\x00\x00\x00\x98\x5f\xd3\x36\x0e\xd1\xb8\xbc"
-    capture_info_9 = "\x1b\x28\x90\x38\x08\x00\x45\x00\x00\x28\x23\x8f\x40\x00\x35\x06"
-    capture_info_10 = "\xb7\x82\xdf\xfc\xc7\x07\xc0\xa8\x03\x12\x00\x50\xcd\x2e\xa5\x91"
-    capture_info_11 = "\xa1\xca\x2c\xeb\xdc\xec\x50\x11\x1a\x38\x0c\x2a\x00\x00\x87\xd7"
-    capture_info_12 = "\x3c\x01\x00\x00\x00\x00\x36\x00\x36\x00\x00\x00\x00\x00\x00\x00"
-    capture_info_13 = capture_info_2
-    capture_info_14 = "\x00\x00\x00\x00\x00\x00\xb8\xbc\x1b\x28\x90\x38\x98\x5f\xd3\x36"
-    capture_info_15 = "\x0e\xd1\x08\x00\x45\x00\x00\x28\x56\xc7\x40\x00\x80\x06\x39\x4a"
-    capture_info_16 = "\xc0\xa8\x03\x12\xdf\xfc\xc7\x07\xcd\x2e\x00\x50\x2c\xeb\xdc\xec"
-    capture_info_17 = "\xa5\x91\xa1\xcb\x50\x10\xff\xff\x26\x62\x00\x00\xad\xe4\x48\x01"
-    capture_info_18 = "\x00\x00\x00\x00\x36\x00\x36\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-    capture_info_19 = capture_info_2
-    capture_info_20 = "\x00\x00\x00\x00\xb8\xbc\x1b\x28\x90\x38\x98\x5f\xd3\x36\x0e\xd1"
-    capture_info_21 = "\x08\x00\x45\x00\x00\x28\x56\xc8\x40\x00\x80\x06\x39\x49\xc0\xa8"
-    capture_info_22 = "\x03\x12\xdf\xfc\xc7\x07\xcd\x29\x00\x50\x20\xd8\x38\xba\x1f\x60"
-    capture_info_23 = "\xe1\x56\x50\x11\x03\xfe\x19\x54\x00\x00\x6e\xd1\x49\x01\x00\x00"
-    capture_info_24 = "\x00\x00\x67\x00\x67\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-    capture_info_25 = capture_info_2
-    capture_info_26 = "\x00\x00\xb8\xbc\x1b\x28\x90\x38\x98\x5f\xd3\x36\x0e\xd1\x08\x00"
-    capture_info_27 = "\x45\x00\x00\x59\x0a\x4b\x00\x00\x80\x11\x64\x9e\xc0\xa8\x03\x12"
-    capture_info_28 = "\x9d\x38\x6a\xb8\xc8\x1f\x0d\xd8\x00\x45\xd5\x06\x00\x01\x00\x00"
-    capture_info_29 = "\x42\xe1\x6e\xde\x09\x55\x08\x0a\x00\x60\x00\x00\x00\x00\x08\x3a"
-    capture_info_30 = "\xff\xfe\x80\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff"
-    capture_info_31 = "\xfe\xff\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-    capture_info_32 = "\x02\x85\x00\x7d\x38\x00\x00\x00\x00"
-    capture = capture_head + capture_info_1 + capture_info_2 * 6 + capture_info_3 + capture_info_2 + capture_info_4 + capture_info_5 + str(
-        content)
-    capture = capture + capture_info_6 + capture_info_7 + capture_info_8 + capture_info_9 + capture_info_10 + capture_info_11 + capture_info_12 + capture_info_13 + capture_info_14 + capture_info_15
-    capture = capture + capture_info_16 + capture_info_17 + capture_info_18 + capture_info_19 + capture_info_20
-    capture = capture + capture_info_21 + capture_info_22 + capture_info_23 + capture_info_24 + capture_info_25
-    capture = capture + capture_info_26 + capture_info_27 + capture_info_28 + capture_info_29 + capture_info_30
-    capture = capture + capture_info_31 + capture_info_32
+    head = b'\x58\x43\x50\x00'
+    version = b'\x30\x30\x32\x2e\x30\x30\x31\x00'
+    if timestamp == "":
+        time_stamp = b'\x00\x00\x00\x00'
+    else:
+        time_stamp = timestamp
+    file_length = b''
+    first_pkt_time = b''
+    first_pkt_length = b''
+    pkt_num = b'\x4f\x00\x00\x00'
+    dump_00 = b'\x00\x00\x00\x00'
+    dump_80 = b'\x80\x00\x00\x00'
+    capture = head + version + time_stamp + pkt_num + dump_00 + dump_80 + file_length
+    capture = capture + dump_00 * 24 + first_pkt_time + dump_00 + first_pkt_length * 2 + dump_00 * 7
+    capture += content
+
+    print("Reverse Test:")
+    # print(bytes().fromhex('0102'))
+    # print(struct.pack('<H', 65534) + b'\x00\x00')
+    # print(struct.pack('<HH', 65534, 1))
+    # temp = hex(79)
+    # print(repr(temp))
+    # temp = hex(79)[2::]
+    # print(temp)
+    # print(bytes().fromhex(temp))
+    # temp += "000000"
+    # data = bytes().fromhex(temp)
+    # print(temp)
+    # print(data)
+    int_to_little_endian(468)
+    int_to_little_endian(122331)
+
+    # print(struct.pack('@hhhh', int(data[0:2], 16), int(data[2:4], 10), int(data[4:6], 10), int(data[6:8], 10)))
     # print(capture)
-    file.write(bytes(capture, 'UTF-8'))
+    file.write(capture)
     file.close()
-    print(outfile)
     return 0
+
+
+def little_endian_to_int(data):
+    reversed_data = data[3] * 16777216 + data[2] * 65536 + data[1] * 256 + data[0]
+    return reversed_data
+
+
+def int_to_little_endian(data):
+    if data < 0:
+        print("Number of packets error!")
+        return False
+    elif data < 65536:
+        new_data = struct.pack('<H', data) + b'\x00\x00'
+    elif data < 65536 * 65536:
+        data_high = data % 65536
+        data_low = int(data / 65536)
+        new_data = struct.pack('<HH', data_high, data_low)
+    else:
+        print("Too much packets!")
+        return False
+
+    print(little_endian_to_int(new_data))
+
+    return new_data

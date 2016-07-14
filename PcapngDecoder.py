@@ -2,58 +2,94 @@ import FileWriter
 
 
 def decoder(file_dir_name, file_name):
-    origin_file = open(file_dir_name, "rb")
-    origin_file_content = origin_file.read()
+    # open file
+    file = open(file_dir_name, "rb")
+    full_content = file.read()
+    content_length = len(full_content)
+    print("Size of the packet: " + str(content_length))
 
-    block_type_start = 0
-    block_type_end = 4
-    block_type = origin_file_content[block_type_start:block_type_end]
-    print("$$ Block Type: " + str(block_type))
+    pointer = 0  # point to the location where the packet is parsed
+    counter = 0  # count the number of the block in the packet
+    number = 0  # number of packets
+    packet_content = b''
 
-    block_total_length_start = 4
-    block_total_length_end = 8
-    block_total_length = origin_file_content[block_total_length_start:block_total_length_end]
-    length = block_total_length.decode("utf-8")
-    print("$$ Block Total Length: " + str(block_total_length))
+    # parsing the packet
+    for b in full_content:
+        print("----------------------------")
+        if pointer >= content_length:  # in case of reaching the end of the file
+            break
+        block_type = full_content[pointer:pointer + 4]  # block type
+        counter += 1
+        print("No." + str(counter) + " Block: ")
+        flag = block_checker(block_type)  # whether the block is useful
+        block_length = int(reverse_binary(full_content[pointer + 4:pointer + 8]))  # the length of the block
+        print("\tBlock Length: " + str(block_length))
 
-    block_body_start = 8
-    block_body_end = origin_file_content[8:32].find(block_total_length) + 8
-    block_body = origin_file_content[block_body_start:block_body_end]
-    print("$$ Block Body: " + str(block_body))
+        timestamp_high = full_content[pointer + 12: pointer + 16]
+        timestamp_low = full_content[pointer + 16: pointer + 20]
+        # check the parsing result is correspond to what we expected
+        if full_content[pointer + 4:pointer + 8] != full_content[pointer + block_length - 4:pointer + block_length]:
+            print("Block parse error!")
+        else:
+            print("Block parse succeed!")
+        pointer += block_length
+        print("Pointer now: " + str(pointer))
 
-    block_total_length_2_start = block_body_end
-    block_total_length_2_end = block_total_length_2_start + 4
-    block_total_length_2 = origin_file_content[block_total_length_2_start:block_total_length_2_end]
-    print("$$ Block Total Length: " + str(block_total_length_2))
-    if block_total_length != block_total_length_2:
-        print("Package parse error!")
-        return False
-    else:
-        print("Package parse succeed!")
+        # output useful information
+        if flag == 1:
+            packet_content += full_content[pointer - block_length:pointer]
+            print("Timestamp is: " + str(timestamp_high) + str(timestamp_low))
+            number += 1
+            print("Collected position: " + str(pointer))
 
-    device_system = origin_file_content[112:142]
-    print("$$ Device System: " + str(device_system))
+    print("The number of packets: " + str(number))
 
-    length_of_package = len(origin_file_content)
-    print(length_of_package)
+    time_stamp = timestamp_high
 
-    end_of_package = length_of_package - 518
-    real_content = origin_file_content[211:end_of_package]
-    print("Content parsed!")
-
-    block_type = origin_file_content[0:4]
-    print(block_type)
-    if block_type == int("0x0a", 16):
-        print("This is Pcap-NG file!")
-    else:
-        print("THIS IS NOT A PCAPNG FILE!")
-
-    block_total_length = origin_file_content[4:8]
-    print(str(block_total_length))
-
-    section_head_block = origin_file_content[0:46]
-    print(section_head_block)
-
-    FileWriter.file_writer(real_content, file_name)
+    FileWriter.file_writer(packet_content, time_stamp, file_name)
 
     return True
+
+
+def block_checker(block_type):
+    shb_block_type = b'\x0a\x0d\x0d\x0a'
+    idb_block_type = b'\x01\x00\x00\x00'
+    pb_block_type = b'\x02\x00\x00\x00'
+    spb_block_type = b'\x03\x00\x00\x00'
+    nrb_block_type = b'\x04\x00\x00\x00'
+    isp_block_type = b'\x05\x00\x00\x00'
+    epb_block_type = b'\x06\x00\x00\x00'
+    irig_block_type = b'\x07\x00\x00\x00'
+
+    if block_type == shb_block_type:
+        print("\tSHB parsed!")
+        return 0
+    elif block_type == idb_block_type:
+        print("\tIDB parsed!")
+        return 0
+    elif block_type == pb_block_type:
+        print("\tPB parsed!")
+        return 0
+    elif block_type == spb_block_type:
+        print("\tSPB parsed!")
+        return 0
+    elif block_type == nrb_block_type:
+        print("\tNRB parsed!")
+        return 0
+    elif block_type == isp_block_type:
+        print("\tISP parsed!")
+        return 0
+    elif block_type == epb_block_type:
+        print("\tEPB parsed!")
+        return 1
+    elif block_type == irig_block_type:
+        print("\tIRIG parsed!")
+        return 0
+    else:
+        print("\tUnknown block!")
+        return 0
+
+
+def reverse_binary(data):
+    reversed_data = data[3] * 16777216 + data[2] * 65536 + data[1] * 256 + data[0]
+    return reversed_data
