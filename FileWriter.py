@@ -51,6 +51,13 @@ def file_writer(package):
     # int_to_little_endian(468)
     # int_to_little_endian(122331)
 
+    for i in range(0, 65536 * 66536 - 1):
+        if i != little_endian_to_int(int_to_little_endian(i)):
+            print("Number: " + str(i))
+            print("\tError!")
+            break
+
+    print("Success!")
     # print(struct.pack('@hhhh', int(data[0:2], 16), int(data[2:4], 10), int(data[4:6], 10), int(data[6:8], 10)))
     # print(capture)
     file.write(capture)
@@ -76,7 +83,5 @@ def int_to_little_endian(data):
     else:
         print("Too much packets!")
         return False
-
-    print(little_endian_to_int(new_data))
 
     return new_data
