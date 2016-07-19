@@ -18,9 +18,7 @@ def file_writer(package):
     time_stamp = package[1]
     pkt_counter = package[2]
     content_length = package[3]
-    first_pkt_time = package[4]
-    first_pkt_length = package[5]
-    content = package[6]
+    content = package[4]
 
     # 输出文件地址和文件名：
     outfile = "./output/" + file_name + "_output.cap"
@@ -32,34 +30,20 @@ def file_writer(package):
     dump_00 = b'\x00\x00\x00\x00'
     dump_80 = b'\x80\x00\x00\x00'
     capture = head + version + time_stamp + pkt_counter + dump_00 + dump_80 + content_length
-    capture = capture + dump_00 * 24 + first_pkt_time + dump_00 + first_pkt_length + first_pkt_length + dump_00 * 7
-    capture += content
+    capture = capture + dump_00 * 24 + content
 
+    '''
     print("Reverse Test:")
-    # print(bytes().fromhex('0102'))
-    # print(struct.pack('<H', 65534) + b'\x00\x00')
-    # print(struct.pack('<HH', 65534, 1))
-    # temp = hex(79)
-    # print(repr(temp))
-    # temp = hex(79)[2::]
-    # print(temp)
-    # print(bytes().fromhex(temp))
-    # temp += "000000"
-    # data = bytes().fromhex(temp)
-    # print(temp)
-    # print(data)
-    # int_to_little_endian(468)
-    # int_to_little_endian(122331)
-
     for i in range(0, 65536 * 66536 - 1):
         if i != little_endian_to_int(int_to_little_endian(i)):
             print("Number: " + str(i))
             print("\tError!")
             break
-
     print("Success!")
-    # print(struct.pack('@hhhh', int(data[0:2], 16), int(data[2:4], 10), int(data[4:6], 10), int(data[6:8], 10)))
-    # print(capture)
+    '''
+    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+    print(int_to_little_endian(975208))
+
     file.write(capture)
     file.close()
     return 0
@@ -73,7 +57,7 @@ def little_endian_to_int(data):
 def int_to_little_endian(data):
     if data < 0:
         print("Number of packets error!")
-        return False
+        return 0
     elif data < 65536:
         new_data = struct.pack('<H', data) + b'\x00\x00'
     elif data < 65536 * 65536:
@@ -82,6 +66,6 @@ def int_to_little_endian(data):
         new_data = struct.pack('<HH', data_high, data_low)
     else:
         print("Too much packets!")
-        return False
+        return 0
 
     return new_data

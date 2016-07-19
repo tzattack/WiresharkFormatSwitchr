@@ -1,56 +1,91 @@
 import FileWriter
+import struct
 
 
 def decoder(file_dir_name, file_name):
     # open file
     file = open(file_dir_name, "rb")
     full_content = file.read()
-    content_length = len(full_content)
-    print("Size of the packet: " + str(content_length))
+    length = len(full_content)
+    print("Size of the packet: " + str(length))
 
     pointer = 0  # point to the location where the packet is parsed
     counter = 0  # count the number of the block in the packet
     number = 0  # number of packets
-    packet_content = b''
+    pkt_content = b''
+    dump = b'\x00\x00\x00\x00'
+    content = b''
+
 
     # parsing the packet
     for b in full_content:
         print("----------------------------")
-        if pointer >= content_length:  # in case of reaching the end of the file
+        if pointer >= length:  # in case of reaching the end of the file
+            print("Reach the end of the file!!!")
             break
         block_type = full_content[pointer:pointer + 4]  # block type
         counter += 1
         print("No." + str(counter) + " Block: ")
         flag = block_checker(block_type)  # whether the block is useful
-        block_length = int(reverse_binary(full_content[pointer + 4:pointer + 8]))  # the length of the block
+        block_length = int(
+            FileWriter.little_endian_to_int(full_content[pointer + 4:pointer + 8]))  # the length of the block
         print("\tBlock Length: " + str(block_length))
+        capture_len = FileWriter.little_endian_to_int(full_content[pointer + 20:pointer + 24])
+        print("\tCapture length: " + str(capture_len))
 
         timestamp_high = full_content[pointer + 12: pointer + 16]
+        print("\tTime High: " + str(FileWriter.little_endian_to_int(timestamp_high)))
         timestamp_low = full_content[pointer + 16: pointer + 20]
+        print("\tTime Low: " + str(FileWriter.little_endian_to_int(timestamp_low)))
         # check the parsing result is correspond to what we expected
         if full_content[pointer + 4:pointer + 8] != full_content[pointer + block_length - 4:pointer + block_length]:
             print("Block parse error!")
         else:
             print("Block parse succeed!")
-        pointer += block_length
-        print("Pointer now: " + str(pointer))
 
         # output useful information
         if flag == 1:
-            packet_content += full_content[pointer - block_length:pointer]
-            print("Timestamp is: " + str(timestamp_high) + str(timestamp_low))
             number += 1
-            print("Collected position: " + str(pointer))
+
+            if number == 1:
+                orig_time = timestamp_high
+                print("Origin Time: ")
+                print(FileWriter.little_endian_to_int(orig_time))
+
+            pkt_content = full_content[pointer + 28:pointer + 28 + capture_len]
+            print("\t@@@@@@@@@@@@@@@ Packet Content:" + str(pkt_content))
+            dup_len = struct.pack('<h', capture_len)
+            print("Duplex length: " + str(dup_len))
+
+            time_base = FileWriter.little_endian_to_int(timestamp_high) * 10000000000 + FileWriter.little_endian_to_int(
+                timestamp_low)
+            time_to_add = time_base - FileWriter.little_endian_to_int(orig_time) * 10000000000
+            print("Time to add: " + str(time_to_add))
+            time_plus = FileWriter.int_to_little_endian(time_to_add)
+            print(time_plus)
+
+            content += time_plus + dump + dup_len + dup_len + dump * 7 + pkt_content
+
+            print("Timestamp is: " + str(timestamp_high) + str(timestamp_low))
+            print("Collected position: " + str(pointer + block_length))
+
+        # move pointer
+        pointer += block_length
+        print("Pointer now: " + str(pointer))
+        temp_length = len(content)
+        content_length = FileWriter.int_to_little_endian(temp_length + 128)
 
     print("The number of packets: " + str(number))
 
-    time_stamp = timestamp_high
-    pkt_counter = number
-    first_pkt_time = timestamp_high
-    first_pkt_length = block_length
-    content = packet_content
-    package = [file_name, time_stamp, pkt_counter, content_length, first_pkt_time, first_pkt_length, content]
+    print("Content Length: " + str(FileWriter.little_endian_to_int(content_length)))
+    print("Target Length: " + str(FileWriter.little_endian_to_int(b'\x59\x48\x00\x00')))
+
+    pkt_counter = FileWriter.int_to_little_endian(number)
+    package = [file_name, time_plus, pkt_counter, content_length, content]
     FileWriter.file_writer(package)
+
+    print("TESTTTTT: ")
+    print(bit_8_hex_to_int(b'\x74'))
 
     return True
 
@@ -94,6 +129,11 @@ def block_checker(block_type):
         return 0
 
 
-def reverse_binary(data):
-    reversed_data = data[3] * 16777216 + data[2] * 65536 + data[1] * 256 + data[0]
-    return reversed_data
+def bit_8_hex_to_int(data):
+    res = data[1] * 16 + data[2]
+    return res
+
+
+def bit_64_hex_to_int(data):
+    res = data
+    return res
