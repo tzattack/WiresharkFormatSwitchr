@@ -12,10 +12,8 @@ def decoder(file_dir_name, file_name):
     pointer = 0  # point to the location where the packet is parsed
     counter = 0  # count the number of the block in the packet
     number = 0  # number of packets
-    pkt_content = b''
     dump = b'\x00\x00\x00\x00'
     content = b''
-
 
     # parsing the packet
     for b in full_content:
@@ -33,10 +31,7 @@ def decoder(file_dir_name, file_name):
         capture_len = FileWriter.little_endian_to_int(full_content[pointer + 20:pointer + 24])
         print("\tCapture length: " + str(capture_len))
 
-        timestamp_high = full_content[pointer + 12: pointer + 16]
-        print("\tTime High: " + str(FileWriter.little_endian_to_int(timestamp_high)))
-        timestamp_low = full_content[pointer + 16: pointer + 20]
-        print("\tTime Low: " + str(FileWriter.little_endian_to_int(timestamp_low)))
+        time_stamp = full_content[pointer + 12: pointer + 20]
         # check the parsing result is correspond to what we expected
         if full_content[pointer + 4:pointer + 8] != full_content[pointer + block_length - 4:pointer + block_length]:
             print("Block parse error!")
@@ -48,25 +43,24 @@ def decoder(file_dir_name, file_name):
             number += 1
 
             if number == 1:
-                orig_time = timestamp_high
+                orig_time = time_stamp
                 print("Origin Time: ")
-                print(FileWriter.little_endian_to_int(orig_time))
+                print(bit_64_hex_to_int(orig_time))
 
             pkt_content = full_content[pointer + 28:pointer + 28 + capture_len]
-            print("\t@@@@@@@@@@@@@@@ Packet Content:" + str(pkt_content))
+
             dup_len = struct.pack('<h', capture_len)
             print("Duplex length: " + str(dup_len))
 
-            time_base = FileWriter.little_endian_to_int(timestamp_high) * 10000000000 + FileWriter.little_endian_to_int(
-                timestamp_low)
-            time_to_add = time_base - FileWriter.little_endian_to_int(orig_time) * 10000000000
-            print("Time to add: " + str(time_to_add))
+            time_base = orig_time
+            time_to_add = bit_64_hex_to_int(time_stamp) - bit_64_hex_to_int(time_base)
             time_plus = FileWriter.int_to_little_endian(time_to_add)
-            print(time_plus)
+            print("Time to add: " + str(time_to_add))
+            print("Time stamp: " + str(bit_64_hex_to_int(time_stamp)))
 
-            content += time_plus + dump + dup_len + dup_len + dump * 7 + pkt_content
+            content += orig_time + dump + dup_len + dup_len + dump * 7 + pkt_content
 
-            print("Timestamp is: " + str(timestamp_high) + str(timestamp_low))
+            print("Timestamp is: " + str(time_stamp))
             print("Collected position: " + str(pointer + block_length))
 
         # move pointer
@@ -81,11 +75,11 @@ def decoder(file_dir_name, file_name):
     print("Target Length: " + str(FileWriter.little_endian_to_int(b'\x59\x48\x00\x00')))
 
     pkt_counter = FileWriter.int_to_little_endian(number)
-    package = [file_name, time_plus, pkt_counter, content_length, content]
+    package = [file_name, orig_time, pkt_counter, content_length, content]
     FileWriter.file_writer(package)
 
     print("TESTTTTT: ")
-    print(bit_8_hex_to_int(b'\x74'))
+    print(bit_8_hex_to_int(b'\xff'))
 
     return True
 
@@ -130,10 +124,12 @@ def block_checker(block_type):
 
 
 def bit_8_hex_to_int(data):
-    res = data[1] * 16 + data[2]
+    res = data[0]
     return res
 
 
 def bit_64_hex_to_int(data):
-    res = data
+    res = data[4] + data[5] * 16 + data[6] * 256 + data[7] * 4096 + data[0] * 65536 + data[1] * 1048576 + data[
+                                                                                                              2] * 16777216 + \
+          data[3] * 268435456
     return res
