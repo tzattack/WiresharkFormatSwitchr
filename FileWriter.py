@@ -41,19 +41,19 @@ def file_writer(package):
             break
     print("Success!")
     '''
-    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-    print(int_to_little_endian(975208))
-
+    # 写入文件
     file.write(capture)
     file.close()
     return 0
 
 
+# 小端序列转换为整数
 def little_endian_to_int(data):
     reversed_data = data[3] * 16777216 + data[2] * 65536 + data[1] * 256 + data[0]
     return reversed_data
 
 
+# 整数转换为小端序列
 def int_to_little_endian(data):
     if data < 0:
         print("Number of packets error!")
