@@ -7,6 +7,7 @@ import Decoder.SnoopDecoder
 import Decoder.NokiaTcpdumpDecoder
 import Decoder.NanosecondLibpcapDecoder
 import Decoder.RedHatTcpdumpDecoder
+import Decoder.SeSETcpdumpDecoder
 
 import FileReader
 
