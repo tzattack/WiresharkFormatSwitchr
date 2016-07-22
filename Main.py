@@ -4,9 +4,10 @@ import Decoder.LibpcapDecoder
 import Decoder.ModifiedTcpdumpDecoder
 import Decoder.PcapngDecoder
 import Decoder.SnoopDecoder
+import Decoder.NokiaTcpdumpDecoder
+import Decoder.NanosecondLibpcapDecoder
 
 import FileReader
-from Decoder import NanosecondLibpcapDecoder
 
 all_file_list = []
 convert_file_list = []
@@ -38,11 +39,15 @@ def file_check(infile, file_name):
 
     if full_content[0:8] == b'\x4d\x3c\xb2\xa1\x02\x00\x04\x00':
         print("<" + file_name + "> is NanosecondLibpcap File")
-        NanosecondLibpcapDecoder.decoder(infile, file_name)
+        Decoder.NanosecondLibpcapDecoder.decoder(infile, file_name)
         return True
-    elif full_content[0:8] == b'\x4d\x3c\xb2\xa1\x02\x00\x04\x00':
-        print("<" + file_name + "> is Libpcap File")
-        Decoder.LibpcapDecoder.decoder(infile, file_name)
+    elif full_content[0:8] == b'\xd4\xc3\xb2\xa1\x02\x00\x04\x00':
+        if full_content[40:44] != b'\x00\x00\x00\x00':
+            print("<" + file_name + "> is Libpcap File")
+            Decoder.LibpcapDecoder.decoder(infile, file_name)
+        elif full_content[40:44] == b'\x00\x00\x00\x00':
+            print("<" + file_name + "> is Nokia Tcpdump File")
+            Decoder.NokiaTcpdumpDecoder.decoder(infile, file_name)
     elif full_content[0:8] == b'\x34\xcd\xb2\xa1\x02\x00\x04\x00':
         print("<" + file_name + "> is Modified Tcpdump File")
         Decoder.ModifiedTcpdumpDecoder.decoder(infile, file_name)
