@@ -2,6 +2,7 @@ import os
 import PcapngDecoder
 import LibpcapDecoder
 import SnoopDecoder
+import NanosecondLibpcapDecoder
 import FileReader
 
 all_file_list = []
@@ -18,12 +19,32 @@ def type_check(infile, file_name):
         PcapngDecoder.decoder(infile, file_name)
         return True
     elif file_type == ".pcap":
-        LibpcapDecoder.decoder(infile, file_name)
+        file_check(infile, file_name)
         return True
     elif file_type == ".snoop":
         SnoopDecoder.decoder(infile, file_name)
     else:
         print("<" + file_name + "> Unknown File Format!")
+        return False
+
+
+def file_check(infile, file_name):
+    # open file
+    file = open(infile, "rb")
+    full_content = file.read()
+
+    if full_content[0:8] == b'\x4d\x3c\xb2\xa1\x02\x00\x04\x00':
+        print("<" + file_name + "> is NanosecondLibpcap File")
+        NanosecondLibpcapDecoder.decoder(infile, file_name)
+        return True
+    elif full_content[0:8] == b'\x4d\x3c\xb2\xa1\x02\x00\x04\x00':
+        print("<" + file_name + "> is Libpcap File")
+        LibpcapDecoder.decoder(infile, file_name)
+    elif full_content[0:8] == b'\x34\xcd\xb2\xa1\x02\x00\x04\x00':
+        print("<" + file_name + "> is Modified Tcpdump File")
+        LibpcapDecoder.decoder(infile, file_name)
+    else:
+        print("<" + file_name + "> is Unknown File Format!")
         return False
 
 

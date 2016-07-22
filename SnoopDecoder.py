@@ -70,7 +70,7 @@ def decoder(file_dir_name, file_name):
         pointer += packet_record_length_int
 
     print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-    pkt_counter = FileWriter.int_to_little_endian(counter)
+    pkt_counter = FileWriter.int_to_little_endian(number)
 
     temp_length = len(content)
     content_length = FileWriter.int_to_little_endian(temp_length + 128)
