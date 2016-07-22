@@ -6,6 +6,7 @@ import Decoder.PcapngDecoder
 import Decoder.SnoopDecoder
 import Decoder.NokiaTcpdumpDecoder
 import Decoder.NanosecondLibpcapDecoder
+import Decoder.RedHatTcpdumpDecoder
 
 import FileReader
 
@@ -45,12 +46,19 @@ def file_check(infile, file_name):
         if full_content[40:44] != b'\x00\x00\x00\x00':
             print("<" + file_name + "> is Libpcap File")
             Decoder.LibpcapDecoder.decoder(infile, file_name)
-        elif full_content[40:44] == b'\x00\x00\x00\x00':
+        elif full_content[40:48] != b'\x00\x00\x00\x00\x00\x00\x00\x00':
             print("<" + file_name + "> is Nokia Tcpdump File")
             Decoder.NokiaTcpdumpDecoder.decoder(infile, file_name)
+        elif full_content[40:48] == b'\x00\x00\x00\x00\x00\x00\x00\x00':
+            print("<" + file_name + "> is Redhat Tcpdump File")
+            Decoder.RedHatTcpdumpDecoder.decoder(infile, file_name)
     elif full_content[0:8] == b'\x34\xcd\xb2\xa1\x02\x00\x04\x00':
-        print("<" + file_name + "> is Modified Tcpdump File")
-        Decoder.ModifiedTcpdumpDecoder.decoder(infile, file_name)
+        if full_content[48:52] != b'\x00\x00\x00\x00':
+            print("<" + file_name + "> is Modified Tcpdump File")
+            Decoder.ModifiedTcpdumpDecoder.decoder(infile, file_name)
+        elif full_content[48:52] == b'\x00\x00\x00\x00':
+            print("<" + file_name + "> is SuSE Tcpdump File")
+            Decoder.SeSETcpdumpDecoder.decoder(infile, file_name)
     else:
         print("<" + file_name + "> is Unknown File Format!")
         return False
