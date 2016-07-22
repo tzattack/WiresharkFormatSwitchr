@@ -36,7 +36,7 @@ def decoder(file_dir_name, file_name):
 
         data_length = FileWriter.little_endian_to_int(included_length)
         print("\tData length: " + str(data_length))
-        packet_data = full_content[pointer + 16:pointer + 16 + data_length]
+        packet_data = full_content[pointer + 24:pointer + 24 + data_length]
 
         dup_len = struct.pack('<H', data_length)
         print("\tDuplex length: " + str(dup_len))
@@ -53,7 +53,7 @@ def decoder(file_dir_name, file_name):
 
         content += time_plus + dump + dup_len + dup_len + dump * 7 + packet_data
 
-        pointer = pointer + data_length + 16
+        pointer = pointer + data_length + 24
 
     print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
     pkt_counter = FileWriter.int_to_little_endian(number)
