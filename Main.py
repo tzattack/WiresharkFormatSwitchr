@@ -8,6 +8,7 @@ import Decoder.NokiaTcpdumpDecoder
 import Decoder.NanosecondLibpcapDecoder
 import Decoder.RedHatTcpdumpDecoder
 import Decoder.SeSETcpdumpDecoder
+import Decoder.FiveviewDecoder
 
 import FileReader
 
@@ -29,6 +30,8 @@ def type_check(infile, file_name):
         return True
     elif file_type == ".snoop":
         Decoder.SnoopDecoder.decoder(infile, file_name)
+    elif file_type == ".5vw":
+        Decoder.FiveviewDecoder.decoder(infile, file_name)
     else:
         print("<" + file_name + "> Unknown File Format!")
         return False
