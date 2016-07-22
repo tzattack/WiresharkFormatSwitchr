@@ -46,7 +46,7 @@ def decoder(file_dir_name, file_name):
             time_stamp = timestamp_seconds
 
         time_base = FileWriter.little_endian_to_int(timestamp_seconds) * 1000000 + FileWriter.little_endian_to_int(
-            timestamp_microseconds) * 0.001
+            timestamp_microseconds)
         time_to_add = time_base - FileWriter.little_endian_to_int(orgin_time) * 1000000
         print("\tTime to add: " + str(time_to_add))
         time_plus = FileWriter.int_to_little_endian(time_to_add)
