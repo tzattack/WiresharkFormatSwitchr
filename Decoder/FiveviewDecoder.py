@@ -36,7 +36,7 @@ def decoder(file_dir_name, file_name):
 
         data_length = FileWriter.little_endian_to_int(included_length)
         print("\tData length: " + str(data_length))
-        packet_data = full_content[pointer + 28:pointer + 28 + data_length]
+        packet_data = full_content[pointer + 36:pointer + 36 + data_length]
 
         dup_len = struct.pack('<H', data_length)
         print("\tDuplex length: " + str(dup_len))
